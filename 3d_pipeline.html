@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Intent Engine - 3D Pipeline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0e27;
+            overflow: hidden;
+            touch-action: none;
+        }
+        
+        #canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .title {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            color: white;
+        }
+        
+        .title h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .title p {
+            font-size: 1.2em;
+            color: #a0aec0;
+        }
+        
+        .message {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(26, 31, 58, 0.95);
+            border: 2px solid rgba(102, 126, 234, 0.5);
+            border-radius: 16px;
+            padding: 25px 40px;
+            color: white;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            max-width: 90%;
+        }
+        
+        .message h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .message p {
+            font-size: 1.1em;
+            color: #a0aec0;
+            line-height: 1.6;
+        }
+        
+        .stats {
+            position: absolute;
+            top: 120px;
+            left: 20px;
+            background: rgba(26, 31, 58, 0.9);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+        
+        .stat-item {
+            margin-bottom: 15px;
+        }
+        
+        .stat-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #a0aec0;
+            margin-top: 5px;
+        }
+        
+        .instructions {
+            position: absolute;
+            top: 120px;
+            right: 20px;
+            background: rgba(26, 31, 58, 0.9);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+            backdrop-filter: blur(10px);
+            max-width: 200px;
+        }
+        
+        .instructions h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .instructions p {
+            color: #a0aec0;
+            font-size: 0.9em;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .title h1 {
+                font-size: 1.8em;
+            }
+            
+            .title p {
+                font-size: 1em;
+            }
+            
+            .message {
+                padding: 20px;
+            }
+            
+            .message h2 {
+                font-size: 1.4em;
+            }
+            
+            .message p {
+                font-size: 1em;
+            }
+            
+            .stats, .instructions {
+                font-size: 0.85em;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <div class="overlay">
+        <div class="title">
+            <h1>⚡ Intent Engine</h1>
+            <p>3D Pipeline Visualization</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value">1</div>
+                <div class="stat-label">Command</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">5min</div>
+                <div class="stat-label">Build Time</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">7</div>
+                <div class="stat-label">Guardrails</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">100%</div>
+                <div class="stat-label">Preserved</div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h4>🎮 Controls</h4>
+            <p><strong>Drag</strong> to rotate</p>
+            <p><strong>Pinch</strong> to zoom</p>
+            <p><strong>Auto-rotate</strong> enabled</p>
+        </div>
+        
+        <div class="message">
+            <h2>Intent → Agent in 5 Minutes</h2>
+            <p>Write your intent. Get a production-ready agent with 7 embedded guardrails. Zero manual coding.</p>
+        </div>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth * window.devicePixelRatio;
+            canvas.height = window.innerHeight * window.devicePixelRatio;
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // 3D Pipeline stages
+        const stages = [
+            {
+                name: 'INTENT',
+                emoji: '📝',
+                color: '#10b981',
+                desc: 'Context Capsule',
+                items: ['Objective', 'Outcomes', 'Constraints']
+            },
+            {
+                name: 'VALIDATE',
+                emoji: '✅',
+                color: '#f59e0b',
+                desc: '7 Quality Rules',
+                items: ['Structure', 'Quality', 'Completeness']
+            },
+            {
+                name: 'COMPILE',
+                emoji: '⚙️',
+                color: '#3b82f6',
+                desc: 'Generate Agent',
+                items: ['Parse', 'Generate', 'Embed']
+            },
+            {
+                name: 'AGENT',
+                emoji: '🚀',
+                color: '#667eea',
+                desc: 'Production Ready',
+                items: ['Claude', 'ReAct', 'Guardrails']
+            }
+        ];
+        
+        // 3D rotation
+        let rotationY = 0;
+        let rotationX = 0.2;
+        let autoRotate = true;
+        let scale = 1;
+        
+        // Touch/drag state
+        let isDragging = false;
+        let lastX = 0;
+        let lastY = 0;
+        let lastTouchDistance = 0;
+        
+        // 3D projection
+        function project3D(x, y, z) {
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            const distance = 800;
+            
+            // Rotate around Y axis
+            const cosY = Math.cos(rotationY);
+            const sinY = Math.sin(rotationY);
+            const x1 = x * cosY - z * sinY;
+            const z1 = x * sinY + z * cosY;
+            
+            // Rotate around X axis
+            const cosX = Math.cos(rotationX);
+            const sinX = Math.sin(rotationX);
+            const y1 = y * cosX - z1 * sinX;
+            const z2 = y * sinX + z1 * cosX;
+            
+            // Perspective projection
+            const perspective = distance / (distance + z2);
+            const screenX = centerX + x1 * perspective * scale;
+            const screenY = centerY + y1 * perspective * scale;
+            
+            return { x: screenX, y: screenY, z: z2, scale: perspective };
+        }
+        
+        // Draw 3D box
+        function drawBox(x, y, z, width, height, depth, color, alpha = 1) {
+            const hw = width / 2;
+            const hh = height / 2;
+            const hd = depth / 2;
+            
+            // Define 8 corners
+            const corners = [
+                project3D(x - hw, y - hh, z - hd),
+                project3D(x + hw, y - hh, z - hd),
+                project3D(x + hw, y + hh, z - hd),
+                project3D(x - hw, y + hh, z - hd),
+                project3D(x - hw, y - hh, z + hd),
+                project3D(x + hw, y - hh, z + hd),
+                project3D(x + hw, y + hh, z + hd),
+                project3D(x - hw, y + hh, z + hd)
+            ];
+            
+            // Draw faces (back to front based on z)
+            const faces = [
+                { points: [4, 5, 6, 7], z: corners[4].z }, // front
+                { points: [0, 1, 2, 3], z: corners[0].z }, // back
+                { points: [1, 5, 6, 2], z: corners[1].z }, // right
+                { points: [0, 4, 7, 3], z: corners[0].z }, // left
+                { points: [3, 2, 6, 7], z: corners[3].z }, // top
+                { points: [0, 1, 5, 4], z: corners[0].z }  // bottom
+            ];
+            
+            // Sort faces by z (painter's algorithm)
+            faces.sort((a, b) => a.z - b.z);
+            
+            faces.forEach((face, i) => {
+                const brightness = 0.6 + (i / faces.length) * 0.4;
+                ctx.fillStyle = color + Math.floor(alpha * brightness * 255).toString(16).padStart(2, '0');
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 2;
+                
+                ctx.beginPath();
+                face.points.forEach((p, j) => {
+                    if (j === 0) {
+                        ctx.moveTo(corners[p].x, corners[p].y);
+                    } else {
+                        ctx.lineTo(corners[p].x, corners[p].y);
+                    }
+                });
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+            });
+        }
+        
+        // Draw connecting line
+        function drawConnection(x1, y1, z1, x2, y2, z2) {
+            const p1 = project3D(x1, y1, z1);
+            const p2 = project3D(x2, y2, z2);
+            
+            const gradient = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
+            gradient.addColorStop(0, 'rgba(102, 126, 234, 0.6)');
+            gradient.addColorStop(1, 'rgba(118, 75, 162, 0.6)');
+            
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+            
+            // Arrow head
+            const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x);
+            const arrowSize = 15;
+            ctx.fillStyle = 'rgba(118, 75, 162, 0.8)';
+            ctx.beginPath();
+            ctx.moveTo(p2.x, p2.y);
+            ctx.lineTo(
+                p2.x - arrowSize * Math.cos(angle - Math.PI / 6),
+                p2.y - arrowSize * Math.sin(angle - Math.PI / 6)
+            );
+            ctx.lineTo(
+                p2.x - arrowSize * Math.cos(angle + Math.PI / 6),
+                p2.y - arrowSize * Math.sin(angle + Math.PI / 6)
+            );
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        // Draw text
+        function drawText(text, x, y, z, size, color = 'white', bold = false) {
+            const p = project3D(x, y, z);
+            if (p.z < 0) return; // Behind camera
+            
+            ctx.fillStyle = color;
+            ctx.font = `${bold ? 'bold ' : ''}${size * p.scale}px sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, p.x, p.y);
+        }
+        
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw connections first (behind boxes)
+            for (let i = 0; i < stages.length - 1; i++) {
+                const x1 = (i - 1.5) * 300;
+                const x2 = (i - 0.5) * 300;
+                drawConnection(x1, 0, 0, x2, 0, 0);
+            }
+            
+            // Draw stages
+            stages.forEach((stage, i) => {
+                const x = (i - 1.5) * 300;
+                const y = 0;
+                const z = 0;
+                
+                // Draw box
+                drawBox(x, y, z, 200, 200, 100, stage.color, 0.8);
+                
+                // Draw emoji
+                drawText(stage.emoji, x, y - 60, z + 60, 50);
+                
+                // Draw name
+                drawText(stage.name, x, y - 10, z + 60, 24, 'white', true);
+                
+                // Draw description
+                drawText(stage.desc, x, y + 20, z + 60, 16, '#a0aec0');
+                
+                // Draw items
+                stage.items.forEach((item, j) => {
+                    drawText(item, x, y + 50 + j * 20, z + 60, 14, '#667eea');
+                });
+            });
+            
+            // Draw guardrails orbiting around
+            const time = Date.now() / 1000;
+            for (let i = 0; i < 7; i++) {
+                const angle = (i / 7) * Math.PI * 2 + time * 0.5;
+                const radius = 600;
+                const gx = Math.cos(angle) * radius;
+                const gz = Math.sin(angle) * radius;
+                const gy = Math.sin(time + i) * 100;
+                
+                const p = project3D(gx, gy, gz);
+                if (p.z > 0) {
+                    const size = 20 * p.scale;
+                    ctx.fillStyle = '#ef4444';
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = 'white';
+                    ctx.font = `bold ${size * 0.8}px sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText((i + 1).toString(), p.x, p.y);
+                }
+            }
+        }
+        
+        function animate() {
+            if (autoRotate) {
+                rotationY += 0.005;
+            }
+            draw();
+            requestAnimationFrame(animate);
+        }
+        animate();
+        
+        // Touch/Mouse controls
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            
+            if (e.touches.length === 2) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                lastTouchDistance = Math.sqrt(dx * dx + dy * dy);
+            } else {
+                isDragging = true;
+                autoRotate = false;
+                lastX = e.touches[0].clientX;
+                lastY = e.touches[0].clientY;
+            }
+        });
+        
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            
+            if (e.touches.length === 2) {
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (lastTouchDistance > 0) {
+                    const delta = distance / lastTouchDistance;
+                    scale *= delta;
+                    scale = Math.max(0.5, Math.min(2, scale));
+                }
+                lastTouchDistance = distance;
+            } else if (isDragging) {
+                const deltaX = e.touches[0].clientX - lastX;
+                const deltaY = e.touches[0].clientY - lastY;
+                
+                rotationY += deltaX * 0.01;
+                rotationX += deltaY * 0.01;
+                rotationX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotationX));
+                
+                lastX = e.touches[0].clientX;
+                lastY = e.touches[0].clientY;
+            }
+        });
+        
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            isDragging = false;
+            lastTouchDistance = 0;
+            
+            if (e.touches.length === 0) {
+                setTimeout(() => {
+                    if (!isDragging) {
+                        autoRotate = true;
+                    }
+                }, 2000);
+            }
+        });
+        
+        // Mouse controls
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            autoRotate = false;
+            lastX = e.clientX;
+            lastY = e.clientY;
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - lastX;
+                const deltaY = e.clientY - lastY;
+                
+                rotationY += deltaX * 0.01;
+                rotationX += deltaY * 0.01;
+                rotationX = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotationX));
+                
+                lastX = e.clientX;
+                lastY = e.clientY;
+            }
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+            setTimeout(() => {
+                if (!isDragging) {
+                    autoRotate = true;
+                }
+            }, 2000);
+        });
+        
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            scale *= delta;
+            scale = Math.max(0.5, Math.min(2, scale));
+        });
+    </script>
+</body>
+</html>
