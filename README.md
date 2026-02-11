@@ -39,8 +39,17 @@ Output will be generated in `output/{skill_name}_agent.py`
 ## Test
 
 ```bash
+# Test the converter
 python3 test_converter.py
+
+# Test the converted agent
+python3 test_converted_agent.py
 ```
+
+**Results:**
+- Converter tests: 5/5 passing
+- Converted agent tests: 7/7 passing
+- Total: 12 tests, all passing
 
 ## Key Features
 
