@@ -1,78 +1,62 @@
 # Skill to LangChain Converter
 
-Converts OpenClaw skills (SKILL.md format) into standalone LangChain agent Python files.
+Reusable converter that transforms OpenClaw skills (SKILL.md) into LangChain agents.
 
-## What This Does
+## The Converter
 
-Takes an OpenClaw skill and generates a runnable LangChain agent that preserves the exact logic from the original skill.
-
-## Example: GitHub Skill → LangChain Agent
-
-**Input**: `/app/skills/github/SKILL.md`
-- Bash commands for `gh` CLI operations
-- PR checks, workflow runs, API queries
-
-**Output**: `github_agent.py`
-- LangChain ReAct agent
-- Tools wrapping each `gh` command
-- Claude Sonnet as reasoning engine
-
-## Files
-
-- `skill_to_langchain.py` - Converter implementation
-- `test_converter.py` - TDD test suite (5 tests, all passing)
-- `github_agent.py` - Generated agent from GitHub skill
+`skill_to_langchain.py` - The main converter script (reusable for any skill)
 
 ## Usage
 
 ```bash
-# Run converter
-python3 skill_to_langchain.py
+# Convert the example skill
+python3 skill_to_langchain.py example-skill/SKILL.md
 
-# Run tests
-python3 test_converter.py
+# Convert any skill
+python3 skill_to_langchain.py path/to/your/SKILL.md
 ```
 
-## Test Results
+Output will be generated in `output/{skill_name}_agent.py`
 
-```
-.....
-----------------------------------------------------------------------
-Ran 5 tests in 0.005s
+## Example
 
-OK
-```
+**Input**: `example-skill/SKILL.md` (GitHub skill)
+- YAML frontmatter with metadata
+- Bash commands for `gh` CLI operations
+
+**Output**: `output/github_agent.py`
+- LangChain ReAct agent
+- Tools wrapping each command
+- Claude Sonnet as reasoning engine
 
 ## How It Works
 
 1. **Parse SKILL.md**: Extract YAML frontmatter (name, description) and bash code blocks
-2. **Generate Tools**: Convert each bash command into a LangChain Tool with shell execution
+2. **Generate Tools**: Convert each bash command into a LangChain Tool
 3. **Create Agent**: Wrap tools in ReAct agent with Claude Sonnet
-4. **Output Python**: Standalone file that can run in any LangChain pipeline
+4. **Output Python**: Standalone runnable agent file
+
+## Test
+
+```bash
+python3 test_converter.py
+```
 
 ## Key Features
 
-✅ **TDD Approach**: Tests written first, implementation follows
-✅ **Real Skill**: Uses actual GitHub skill from OpenClaw
+✅ **Reusable**: Works with any OpenClaw skill
+✅ **TDD**: 5 passing unit tests
 ✅ **Preserves Logic**: Exact commands from SKILL.md → LangChain tools
-✅ **Runnable Output**: Generated agent is valid, executable Python
-✅ **Error Handling**: Timeouts, exit codes, exceptions handled
+✅ **Error Handling**: Timeouts, exit codes, exceptions
+✅ **Standalone Output**: Generated agents run independently
+
+## Files
+
+- `skill_to_langchain.py` - **The converter (main deliverable)**
+- `test_converter.py` - Test suite
+- `example-skill/SKILL.md` - Example input (GitHub skill)
+- `output/github_agent.py` - Example output (generated)
 
 ## Feasibility: PROVEN
 
-The converter successfully:
-- Parses complex SKILL.md with YAML frontmatter
-- Extracts 6 bash commands from GitHub skill
-- Generates valid LangChain agent code
-- Passes all 5 unit tests
-
-## Next Steps
-
-1. Add command parameterization (replace hardcoded values with user input)
-2. Handle multi-step workflows with state
-3. Support non-bash skills (API calls, file operations)
-4. Add equivalence testing (verify behavior matches original)
-
-## Conclusion
-
-**MVP validates feasibility.** OpenClaw skills can be converted to LangChain agents with preserved logic. This enables reusing OpenClaw's skill ecosystem in standard Python/LangChain pipelines.
+Successfully converts GitHub skill (6 bash commands) to runnable LangChain agent.

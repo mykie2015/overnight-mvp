@@ -182,19 +182,33 @@ if __name__ == "__main__":
 
 def main():
     """Main conversion workflow."""
+    import sys
+    
     print("🔄 Skill to LangChain Converter\\n")
     
-    # Parse GitHub skill
-    skill_path = "/app/skills/github/SKILL.md"
+    # Get skill path from command line or use default
+    if len(sys.argv) > 1:
+        skill_path = sys.argv[1]
+    else:
+        skill_path = "example-skill/SKILL.md"
+    
+    if not Path(skill_path).exists():
+        print(f"❌ Error: Skill file not found: {skill_path}")
+        print("\\nUsage: python3 skill_to_langchain.py [path/to/SKILL.md]")
+        sys.exit(1)
+    
     print(f"📖 Parsing skill: {skill_path}")
     skill_data = parse_skill_md(skill_path)
     
-    print(f"✅ Found skill: {skill_data['metadata'].get('name', 'unknown')}")
+    skill_name = skill_data['metadata'].get('name', 'unknown')
+    print(f"✅ Found skill: {skill_name}")
     print(f"📝 Description: {skill_data['metadata'].get('description', 'N/A')}")
     print(f"🔧 Extracted {len(skill_data['tools'])} tools\\n")
     
     # Generate LangChain agent
-    output_path = "/home/node/.openclaw/workspace/repos/skill-to-langchain-converter/github_agent.py"
+    output_path = f"output/{skill_name}_agent.py"
+    Path("output").mkdir(exist_ok=True)
+    
     print(f"🏗️  Generating LangChain agent: {output_path}")
     generate_langchain_agent(skill_data, output_path)
     
