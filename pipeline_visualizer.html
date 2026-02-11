@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intent Pipeline Visualizer - Interactive Flow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        /* Pipeline Flow Diagram */
+        .pipeline {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 40px;
+        }
+        
+        .pipeline h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2em;
+            text-align: center;
+        }
+        
+        .flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .flow-step {
+            flex: 1;
+            min-width: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            border-radius: 12px;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .flow-step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        
+        .flow-step .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .flow-step .title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .flow-step .desc {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .flow-arrow {
+            font-size: 2em;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        /* Guardrails Infographic */
+        .guardrails {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 40px;
+        }
+        
+        .guardrails h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2em;
+            text-align: center;
+        }
+        
+        .guardrail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .guardrail-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 5px solid #667eea;
+            padding: 25px;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .guardrail-card:hover {
+            transform: translateX(5px);
+        }
+        
+        .guardrail-card .number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        
+        .guardrail-card h3 {
+            color: #764ba2;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        .guardrail-card p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+        
+        /* Architecture Diagram */
+        .architecture {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 40px;
+        }
+        
+        .architecture h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2em;
+            text-align: center;
+        }
+        
+        .arch-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .arch-layer {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .arch-label {
+            min-width: 150px;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+        
+        .arch-boxes {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+        
+        .arch-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        /* Metrics Dashboard */
+        .metrics {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 40px;
+        }
+        
+        .metrics h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2em;
+            text-align: center;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .metric-card {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .metric-card .value {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .metric-card .label {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .metric-card .sublabel {
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        /* Comparison Chart */
+        .comparison {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 40px;
+        }
+        
+        .comparison h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2em;
+            text-align: center;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: left;
+            font-size: 1.1em;
+        }
+        
+        .comparison-table td {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .comparison-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .comparison-table .feature {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .comparison-table .check {
+            color: #28a745;
+            font-size: 1.5em;
+        }
+        
+        .comparison-table .cross {
+            color: #dc3545;
+            font-size: 1.5em;
+        }
+        
+        /* Interactive Toggle */
+        .toggle-section {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 40px;
+        }
+        
+        .toggle-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .toggle-btn {
+            padding: 15px 30px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .toggle-content {
+            display: none;
+        }
+        
+        .toggle-content.active {
+            display: block;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s ease;
+            margin: 10px 10px 10px 0;
+        }
+        
+        .cta-button:hover {
+            background: #764ba2;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .flow {
+                flex-direction: column;
+            }
+            
+            .flow-arrow {
+                transform: rotate(90deg);
+            }
+            
+            .arch-layer {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Intent Pipeline Visualizer</h1>
+            <p>From Intent to Production Agent - Visual Journey</p>
+        </div>
+        
+        <!-- Pipeline Flow -->
+        <div class="pipeline">
+            <h2>📊 The Complete Pipeline</h2>
+            <div class="flow">
+                <div class="flow-step">
+                    <div class="icon">📝</div>
+                    <div class="title">Write Intent</div>
+                    <div class="desc">Context Capsule with objectives, outcomes, constraints</div>
+                </div>
+                
+                <div class="flow-arrow">→</div>
+                
+                <div class="flow-step">
+                    <div class="icon">✅</div>
+                    <div class="title">Validate</div>
+                    <div class="desc">7 validation rules check structure & quality</div>
+                </div>
+                
+                <div class="flow-arrow">→</div>
+                
+                <div class="flow-step">
+                    <div class="icon">⚙️</div>
+                    <div class="title">Compile</div>
+                    <div class="desc">Generate LangChain agent with embedded guardrails</div>
+                </div>
+                
+                <div class="flow-arrow">→</div>
+                
+                <div class="flow-step">
+                    <div class="icon">🚀</div>
+                    <div class="title">Deploy</div>
+                    <div class="desc">Production-ready agent with monitoring</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 7 Guardrails Infographic -->
+        <div class="guardrails">
+            <h2>🛡️ 7 Embedded Guardrails</h2>
+            <div class="guardrail-grid">
+                <div class="guardrail-card">
+                    <div class="number">1</div>
+                    <h3>Objective-Aware Prompts</h3>
+                    <p>Agent understands WHY it exists, not just WHAT to do. Guides decision-making in edge cases.</p>
+                </div>
+                
+                <div class="guardrail-card">
+                    <div class="number">2</div>
+                    <h3>Steering Constraints</h3>
+                    <p>Soft boundaries in prompt layer guide agent thinking and trade-offs without hard enforcement.</p>
+                </div>
+                
+                <div class="guardrail-card">
+                    <div class="number">3</div>
+                    <h3>Hard Constraints</h3>
+                    <p>Non-negotiable boundaries enforced in code. Cannot be bypassed by prompt manipulation.</p>
+                </div>
+                
+                <div class="guardrail-card">
+                    <div class="number">4</div>
+                    <h3>Decision Boundaries</h3>
+                    <p>Clear separation: autonomous decisions vs escalation triggers. No ambiguity in authority.</p>
+                </div>
+                
+                <div class="guardrail-card">
+                    <div class="number">5</div>
+                    <h3>Stop Rules</h3>
+                    <p>Complete/escalate/halt conditions prevent runaway behavior and infinite loops.</p>
+                </div>
+                
+                <div class="guardrail-card">
+                    <div class="number">6</div>
+                    <h3>Health Metrics</h3>
+                    <p>Non-regression constraints prevent optimization shortcuts and quality degradation.</p>
+                </div>
+                
+                <div class="guardrail-card">
+                    <div class="number">7</div>
+                    <h3>Escalation Triggers</h3>
+                    <p>Automatic detection of situations requiring human intervention. Pre-flight checking.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Architecture Layers -->
+        <div class="architecture">
+            <h2>🏗️ Architecture Layers</h2>
+            <div class="arch-diagram">
+                <div class="arch-layer">
+                    <div class="arch-label">Intent Layer</div>
+                    <div class="arch-boxes">
+                        <div class="arch-box">Objective</div>
+                        <div class="arch-box">Outcomes</div>
+                        <div class="arch-box">Context</div>
+                        <div class="arch-box">Constraints</div>
+                    </div>
+                </div>
+                
+                <div class="arch-layer">
+                    <div class="arch-label">Validation Layer</div>
+                    <div class="arch-boxes">
+                        <div class="arch-box">Structure Check</div>
+                        <div class="arch-box">Quality Check</div>
+                        <div class="arch-box">Completeness Check</div>
+                    </div>
+                </div>
+                
+                <div class="arch-layer">
+                    <div class="arch-label">Compilation Layer</div>
+                    <div class="arch-boxes">
+                        <div class="arch-box">Parser</div>
+                        <div class="arch-box">Code Generator</div>
+                        <div class="arch-box">Guardrail Embedder</div>
+                    </div>
+                </div>
+                
+                <div class="arch-layer">
+                    <div class="arch-label">Agent Layer</div>
+                    <div class="arch-boxes">
+                        <div class="arch-box">LLM (Claude Sonnet)</div>
+                        <div class="arch-box">ReAct Agent</div>
+                        <div class="arch-box">Tools</div>
+                        <div class="arch-box">Executor</div>
+                    </div>
+                </div>
+                
+                <div class="arch-layer">
+                    <div class="arch-label">Runtime Layer</div>
+                    <div class="arch-boxes">
+                        <div class="arch-box">Pre-flight Checks</div>
+                        <div class="arch-box">Execution</div>
+                        <div class="arch-box">Post-flight Validation</div>
+                        <div class="arch-box">Monitoring</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Metrics Dashboard -->
+        <div class="metrics">
+            <h2>📈 Pipeline Metrics</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="value">1</div>
+                    <div class="label">Command</div>
+                    <div class="sublabel">Intent → Agent</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="value">7</div>
+                    <div class="label">Guardrails</div>
+                    <div class="sublabel">Auto-embedded</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="value">100%</div>
+                    <div class="label">Intent Preserved</div>
+                    <div class="sublabel">No information loss</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="value">0</div>
+                    <div class="label">Manual Coding</div>
+                    <div class="sublabel">Fully automated</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="value">5</div>
+                    <div class="label">Layers</div>
+                    <div class="sublabel">Intent to Runtime</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="value">∞</div>
+                    <div class="label">Agents</div>
+                    <div class="sublabel">From one template</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Before/After Comparison -->
+        <div class="comparison">
+            <h2>⚖️ Before vs After</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Manual Coding</th>
+                        <th>Intent Pipeline</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="feature">Time to Build</td>
+                        <td>2-3 days</td>
+                        <td><strong>5 minutes</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Guardrails</td>
+                        <td>Manual implementation</td>
+                        <td><strong>Auto-embedded (7 types)</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Intent Preservation</td>
+                        <td>Lost in translation</td>
+                        <td><strong>100% preserved</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Validation</td>
+                        <td>Manual testing</td>
+                        <td><strong>Automated (7 rules)</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Consistency</td>
+                        <td>Varies by developer</td>
+                        <td><strong>Standardized template</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Iteration Speed</td>
+                        <td>Slow (rewrite code)</td>
+                        <td><strong>Fast (edit intent, recompile)</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="feature">Documentation</td>
+                        <td>Separate from code</td>
+                        <td><strong>Intent IS documentation</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Interactive Toggle Section -->
+        <div class="toggle-section">
+            <h2 style="color: #667eea; text-align: center; margin-bottom: 30px;">🔄 View Different Perspectives</h2>
+            <div class="toggle-buttons">
+                <button class="toggle-btn active" onclick="showView('developer')">Developer View</button>
+                <button class="toggle-btn" onclick="showView('manager')">Manager View</button>
+                <button class="toggle-btn" onclick="showView('architect')">Architect View</button>
+            </div>
+            
+            <div id="developer" class="toggle-content active">
+                <h3 style="color: #764ba2; margin-bottom: 20px;">👨‍💻 Developer Perspective</h3>
+                <ul style="line-height: 2; color: #666; font-size: 1.1em;">
+                    <li>✅ Write intent in markdown (familiar format)</li>
+                    <li>✅ Run one command to generate agent</li>
+                    <li>✅ All guardrails embedded automatically</li>
+                    <li>✅ No boilerplate code to write</li>
+                    <li>✅ Focus on business logic, not plumbing</li>
+                    <li>✅ Iterate by editing intent, not code</li>
+                </ul>
+            </div>
+            
+            <div id="manager" class="toggle-content">
+                <h3 style="color: #764ba2; margin-bottom: 20px;">👔 Manager Perspective</h3>
+                <ul style="line-height: 2; color: #666; font-size: 1.1em;">
+                    <li>📊 Reduce agent development time from days to minutes</li>
+                    <li>📊 Standardized quality across all agents</li>
+                    <li>📊 Intent files serve as living documentation</li>
+                    <li>📊 Easy to review and approve (readable markdown)</li>
+                    <li>📊 Faster iteration = faster time to market</li>
+                    <li>📊 Lower maintenance cost (change intent, not code)</li>
+                </ul>
+            </div>
+            
+            <div id="architect" class="toggle-content">
+                <h3 style="color: #764ba2; margin-bottom: 20px;">🏗️ Architect Perspective</h3>
+                <ul style="line-height: 2; color: #666; font-size: 1.1em;">
+                    <li>🔧 Separation of concerns: intent vs implementation</li>
+                    <li>🔧 Consistent architecture across all agents</li>
+                    <li>🔧 Guardrails enforced at compile time</li>
+                    <li>🔧 Easy to add new guardrail types</li>
+                    <li>🔧 Intent layer enables governance and compliance</li>
+                    <li>🔧 Scalable: one template → infinite agents</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- CTA Section -->
+        <div style="text-align: center; background: white; border-radius: 12px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+            <h2 style="color: #667eea; margin-bottom: 20px;">🚀 Ready to Build?</h2>
+            <p style="color: #666; font-size: 1.2em; margin-bottom: 30px;">
+                Transform your intents into production agents in minutes, not days.
+            </p>
+            <a href="https://github.com/mykie2015/overnight-mvp/pull/4" class="cta-button">View Pull Request</a>
+            <a href="https://github.com/mykie2015/overnight-mvp" class="cta-button">View Repository</a>
+            <a href="https://raw.githack.com/mykie2015/overnight-mvp/feature/intent-to-agent-compiler/compiler_demo.html" class="cta-button">Previous Demo</a>
+        </div>
+        
+        <div class="footer">
+            <p><strong>"Context without intent is noise."</strong></p>
+            <p>Intent Engineering Framework + Agentic Manifesto + LangChain</p>
+            <p>2026-02-11 | OpenClaw Overnight Builder</p>
+        </div>
+    </div>
+    
+    <script>
+        function showView(view) {
+            // Hide all content
+            document.querySelectorAll('.toggle-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected content
+            document.getElementById(view).classList.add('active');
+            
+            // Activate clicked button
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
