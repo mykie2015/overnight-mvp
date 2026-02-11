@@ -95,7 +95,7 @@ import subprocess
 from typing import Optional
 from langchain.agents import Tool, AgentExecutor, create_react_agent
 from langchain.prompts import PromptTemplate
-from langchain_anthropic import ChatAnthropic
+from langchain_openai import ChatOpenAI
 
 
 def run_shell_command(command: str) -> str:
@@ -151,8 +151,8 @@ Question: {{input}}
 Thought: {{agent_scratchpad}}
 """.replace('{skill_name}', name))
 
-# Initialize LLM (using Claude)
-llm = ChatAnthropic(model="claude-sonnet-4-5-20250929", temperature=0)
+# Initialize LLM (using OpenAI)
+llm = ChatOpenAI(model="gpt-4", temperature=0)
 
 # Create agent
 agent = create_react_agent(llm, tools, prompt)

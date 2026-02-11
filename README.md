@@ -27,13 +27,13 @@ Output will be generated in `output/{skill_name}_agent.py`
 **Output**: `output/github_agent.py`
 - LangChain ReAct agent
 - Tools wrapping each command
-- Claude Sonnet as reasoning engine
+- OpenAI GPT-4 as reasoning engine
 
 ## How It Works
 
 1. **Parse SKILL.md**: Extract YAML frontmatter (name, description) and bash code blocks
 2. **Generate Tools**: Convert each bash command into a LangChain Tool
-3. **Create Agent**: Wrap tools in ReAct agent with Claude Sonnet
+3. **Create Agent**: Wrap tools in ReAct agent with OpenAI GPT-4
 4. **Output Python**: Standalone runnable agent file
 
 ## Test
