@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Capsule Template System - Interactive Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .card p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .card li {
+            padding: 8px 0;
+            color: #555;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card li:last-child {
+            border-bottom: none;
+        }
+        
+        .card li::before {
+            content: "✓ ";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .demo-section {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 40px;
+        }
+        
+        .demo-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        
+        .intent-preview {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.8;
+        }
+        
+        .intent-preview h3 {
+            color: #764ba2;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        
+        .intent-preview h3:first-child {
+            margin-top: 0;
+        }
+        
+        .validation-result {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .validation-result h3 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        
+        .validation-result ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .validation-result li {
+            padding: 5px 0;
+            color: #155724;
+        }
+        
+        .validation-result li::before {
+            content: "✅ ";
+            margin-right: 8px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s ease;
+            margin: 10px 10px 10px 0;
+        }
+        
+        .cta-button:hover {
+            background: #764ba2;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .demo-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Context Capsule Template System</h1>
+            <p>Intent Engineering Framework for AI Agents</p>
+        </div>
+        
+        <div class="cards">
+            <div class="card">
+                <h2>📋 Template</h2>
+                <p>Standardized intent structure following best practices from Intent Engineering Framework and Agentic Manifesto.</p>
+                <ul>
+                    <li>Objective (WHY it matters)</li>
+                    <li>Desired Outcomes (2-4 states)</li>
+                    <li>Health Metrics (non-regression)</li>
+                    <li>Strategic Context</li>
+                    <li>Constraints (Steering + Hard)</li>
+                    <li>Decision Types (Autonomous vs Escalate)</li>
+                    <li>Stop Rules (Complete/Escalate/Halt)</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h2>✅ Validator</h2>
+                <p>Python script that checks intent quality and structure with 7 validation rules.</p>
+                <ul>
+                    <li>Required sections present</li>
+                    <li>Objective explains WHY</li>
+                    <li>Outcomes are states (not activities)</li>
+                    <li>2-4 outcomes defined</li>
+                    <li>Health metrics prevent shortcuts</li>
+                    <li>Both constraint types present</li>
+                    <li>Decision boundaries clear</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h2>🚀 Quick Start</h2>
+                <p>Get started in 5 minutes with complete documentation and examples.</p>
+                <ul>
+                    <li>Copy template to intents/</li>
+                    <li>Fill out required sections</li>
+                    <li>Run validator</li>
+                    <li>Fix errors/warnings</li>
+                    <li>Ready for agent generation</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>📖 Example: Customer Support Agent</h2>
+            
+            <div class="intent-preview">
+                <h3>## Objective</h3>
+                Help customers resolve Tier-1 technical issues without frustration so they can get back to work quickly and maintain trust in our product.
+                
+                <h3>## Desired Outcomes</h3>
+                - Customer confirms their issue is resolved<br>
+                - No follow-up ticket on same topic within 24 hours<br>
+                - Customer rates interaction as helpful (>4/5)<br>
+                - Issue resolution documented for knowledge base
+                
+                <h3>## Health Metrics</h3>
+                - Response accuracy must stay >95%<br>
+                - Escalation rate remains &lt;15% of total tickets<br>
+                - Customer satisfaction score stays >4.0/5<br>
+                - Average resolution time stays &lt;10 minutes
+                
+                <h3>## Constraints</h3>
+                <strong>Steering Constraints (Prompt Layer):</strong><br>
+                - Prioritize clarity over technical accuracy<br>
+                - Use simple language, avoid jargon<br>
+                - Acknowledge frustration empathetically<br>
+                <br>
+                <strong>Hard Constraints (Enforced in Code):</strong><br>
+                - Never access customer payment information<br>
+                - Maximum 3 knowledge base API calls per ticket<br>
+                - Response time must be &lt;2 seconds
+                
+                <h3>## Decision Types & Autonomy</h3>
+                <strong>Autonomous Decisions:</strong><br>
+                - Standard troubleshooting steps<br>
+                - Providing documentation links<br>
+                <br>
+                <strong>Escalate to Human:</strong><br>
+                - Refund requests >$50<br>
+                - Account security issues<br>
+                - Unable to resolve after 3 attempts
+                
+                <h3>## Stop Rules</h3>
+                <strong>Complete Successfully When:</strong> Customer confirms resolved<br>
+                <strong>Escalate When:</strong> Unable to resolve after 3 attempts<br>
+                <strong>Halt Immediately When:</strong> Security violation detected
+            </div>
+            
+            <div class="validation-result">
+                <h3>✅ Validation Result</h3>
+                <ul>
+                    <li>All required sections present</li>
+                    <li>Objective explains WHY (not just WHAT)</li>
+                    <li>Outcomes are observable states</li>
+                    <li>4 outcomes defined (within 2-4 range)</li>
+                    <li>Health metrics prevent optimization shortcuts</li>
+                    <li>Both Steering and Hard constraints defined</li>
+                    <li>Decision boundaries clear (Autonomous vs Escalate)</li>
+                    <li>Stop rules comprehensive (Complete/Escalate/Halt)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h2>🎯 Philosophy</h2>
+            <p style="font-size: 1.2em; line-height: 1.8; color: #555; margin-bottom: 20px;">
+                <strong>"Context without intent is noise."</strong>
+            </p>
+            <p style="line-height: 1.8; color: #666;">
+                Agents fail not because they can't reason, but because objectives, outcomes, and constraints are underspecified. 
+                This template ensures every intent is <strong>clear</strong>, <strong>measurable</strong>, <strong>bounded</strong>, 
+                <strong>autonomous</strong>, and <strong>safe</strong>.
+            </p>
+            
+            <div style="margin-top: 30px;">
+                <a href="https://github.com/mykie2015/overnight-mvp/tree/feature/context-capsule-template/templates" class="cta-button">View on GitHub</a>
+                <a href="https://github.com/mykie2015/overnight-mvp/blob/feature/context-capsule-template/templates/README.md" class="cta-button">Read Documentation</a>
+                <a href="https://github.com/mykie2015/overnight-mvp/blob/feature/context-capsule-template/templates/QUICKSTART.md" class="cta-button">Quick Start Guide</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Built with Intent Engineering Framework + Agentic Manifesto principles</p>
+            <p>2026-02-11 | OpenClaw Overnight Builder</p>
+        </div>
+    </div>
+</body>
+</html>
