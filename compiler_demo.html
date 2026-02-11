@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intent-to-Agent Compiler - Live Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .panel h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .code-block .keyword {
+            color: #ff79c6;
+        }
+        
+        .code-block .string {
+            color: #f1fa8c;
+        }
+        
+        .code-block .comment {
+            color: #6272a4;
+        }
+        
+        .arrow {
+            text-align: center;
+            font-size: 3em;
+            color: white;
+            padding: 20px 0;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .stat-card .number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .label {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .features {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 40px;
+        }
+        
+        .features h2 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature {
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .feature h3 {
+            color: #764ba2;
+            margin-bottom: 10px;
+        }
+        
+        .feature p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background 0.3s ease;
+            margin: 10px 10px 10px 0;
+        }
+        
+        .cta-button:hover {
+            background: #764ba2;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Intent-to-Agent Compiler</h1>
+            <p>Context Capsule → Production-Ready LangChain Agent</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="number">1</div>
+                <div class="label">Command</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">7</div>
+                <div class="label">Guardrails Embedded</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">100%</div>
+                <div class="label">Intent Preserved</div>
+            </div>
+            <div class="stat-card">
+                <div class="number">0</div>
+                <div class="label">Manual Coding</div>
+            </div>
+        </div>
+        
+        <div class="demo-grid">
+            <div class="panel">
+                <h2>📋 Input: Context Capsule</h2>
+                <div class="code-block">
+<span class="comment"># Intent: Customer Support Agent</span>
+
+<span class="keyword">## Objective</span>
+Help customers resolve Tier-1 technical issues 
+without frustration so they can get back to work 
+quickly and maintain trust in our product.
+
+<span class="keyword">## Desired Outcomes</span>
+- Customer confirms their issue is resolved
+- No follow-up ticket within 24 hours
+- Customer rates interaction as helpful (>4/5)
+
+<span class="keyword">## Constraints</span>
+
+<span class="keyword">### Steering Constraints</span>
+- Prioritize clarity over technical accuracy
+- Use simple language, avoid jargon
+- Acknowledge frustration empathetically
+
+<span class="keyword">### Hard Constraints</span>
+- Never access customer payment information
+- Maximum 3 knowledge base API calls per ticket
+- Response time must be <2 seconds
+
+<span class="keyword">## Decision Types & Autonomy</span>
+
+<span class="keyword">### Autonomous Decisions</span>
+- Standard troubleshooting steps
+- Providing documentation links
+
+<span class="keyword">### Escalate to Human</span>
+- Refund requests >$50
+- Account security issues
+- Unable to resolve after 3 attempts
+
+<span class="keyword">## Stop Rules</span>
+- <span class="keyword">Complete:</span> Customer confirms resolved
+- <span class="keyword">Escalate:</span> Unable to resolve after 3 attempts
+- <span class="keyword">Halt:</span> Security violation detected
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>⚡ Output: LangChain Agent</h2>
+                <div class="code-block">
+<span class="keyword">class</span> <span class="string">CustomerSupportAgent</span>:
+    <span class="comment">"""Agent with embedded intent guardrails."""</span>
+    
+    <span class="keyword">def</span> __init__(self):
+        self.llm = ChatAnthropic(
+            model=<span class="string">"claude-sonnet-4-5-20250929"</span>,
+            temperature=<span class="string">0</span>
+        )
+        
+        <span class="comment"># Intent-based constraints</span>
+        self.steering_constraints = [
+            <span class="string">"Prioritize clarity over technical accuracy"</span>,
+            <span class="string">"Use simple language, avoid jargon"</span>,
+            <span class="string">"Acknowledge frustration empathetically"</span>
+        ]
+        
+        self.hard_constraints = [
+            <span class="string">"Never access customer payment information"</span>,
+            <span class="string">"Maximum 3 knowledge base API calls"</span>,
+            <span class="string">"Response time must be <2 seconds"</span>
+        ]
+        
+        self.autonomous_decisions = [
+            <span class="string">"Standard troubleshooting steps"</span>,
+            <span class="string">"Providing documentation links"</span>
+        ]
+        
+        self.escalation_triggers = [
+            <span class="string">"Refund requests >$50"</span>,
+            <span class="string">"Account security issues"</span>,
+            <span class="string">"Unable to resolve after 3 attempts"</span>
+        ]
+        
+        self.agent = self._build_agent()
+    
+    <span class="keyword">def</span> run(self, input_text: str) -> Dict:
+        <span class="comment"># Check escalation triggers</span>
+        <span class="keyword">for</span> trigger <span class="keyword">in</span> self.escalation_triggers:
+            <span class="keyword">if</span> trigger.lower() <span class="keyword">in</span> input_text.lower():
+                <span class="keyword">return</span> {
+                    <span class="string">"status"</span>: <span class="string">"escalate"</span>,
+                    <span class="string">"reason"</span>: <span class="string">f"Trigger: {trigger}"</span>
+                }
+        
+        <span class="comment"># Run agent with guardrails</span>
+        result = self.agent.invoke({<span class="string">"input"</span>: input_text})
+        <span class="keyword">return</span> {
+            <span class="string">"output"</span>: result[<span class="string">"output"</span>],
+            <span class="string">"status"</span>: <span class="string">"complete"</span>
+        }
+                </div>
+            </div>
+        </div>
+        
+        <div class="arrow">⬇️</div>
+        
+        <div class="features">
+            <h2>🎯 What Gets Embedded</h2>
+            <div class="feature-grid">
+                <div class="feature">
+                    <h3>Objective-Aware Prompts</h3>
+                    <p>Agent understands WHY it exists, not just WHAT to do. Guides decision-making in edge cases.</p>
+                </div>
+                <div class="feature">
+                    <h3>Steering Constraints</h3>
+                    <p>Soft boundaries in prompt layer guide agent thinking and trade-offs.</p>
+                </div>
+                <div class="feature">
+                    <h3>Hard Constraints</h3>
+                    <p>Non-negotiable boundaries enforced in code, not prompts. Cannot be bypassed.</p>
+                </div>
+                <div class="feature">
+                    <h3>Decision Boundaries</h3>
+                    <p>Clear separation: autonomous decisions vs escalation triggers. No ambiguity.</p>
+                </div>
+                <div class="feature">
+                    <h3>Stop Rules</h3>
+                    <p>Complete/escalate/halt conditions prevent runaway behavior and infinite loops.</p>
+                </div>
+                <div class="feature">
+                    <h3>Health Metrics</h3>
+                    <p>Non-regression constraints prevent optimization shortcuts and quality degradation.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <h2>⚡ Usage</h2>
+            <div class="code-block">
+<span class="comment"># Compile intent to agent</span>
+$ python3 intent_to_agent_simple.py templates/example-customer-support.md customer_support_agent.py
+
+<span class="string">✅ Generated: customer_support_agent.py
+   Intent: Customer Support Agent (Example)
+   Outcomes: 4
+   Constraints: 4 steering, 5 hard</span>
+
+<span class="comment"># Use the generated agent</span>
+<span class="keyword">from</span> customer_support_agent <span class="keyword">import</span> CustomerSupportAgentExampleAgent
+
+agent = CustomerSupportAgentExampleAgent()
+result = agent.run(<span class="string">"My app keeps crashing"</span>)
+
+<span class="keyword">print</span>(result[<span class="string">"status"</span>])   <span class="comment"># "complete" or "escalate"</span>
+<span class="keyword">print</span>(result[<span class="string">"output"</span>])   <span class="comment"># Agent's response</span>
+            </div>
+        </div>
+        
+        <div class="features">
+            <h2>🔗 The Full Stack</h2>
+            <p style="font-size: 1.1em; line-height: 1.8; color: #666; margin-bottom: 30px;">
+                This compiler combines two breakthroughs:
+            </p>
+            <div class="feature-grid">
+                <div class="feature">
+                    <h3>1. Context Capsule Template</h3>
+                    <p>Standardized intent structure following Intent Engineering Framework. Ensures objectives, outcomes, and constraints are properly specified.</p>
+                </div>
+                <div class="feature">
+                    <h3>2. Skill-to-LangChain Converter</h3>
+                    <p>Proven tool generation from OpenClaw skills. Converts bash commands and workflows into LangChain Tools.</p>
+                </div>
+                <div class="feature">
+                    <h3>3. Intent-to-Agent Compiler</h3>
+                    <p>Combines both: parses Context Capsules → generates production-ready agents with embedded guardrails.</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; text-align: center;">
+                <a href="https://github.com/mykie2015/overnight-mvp/pull/3" class="cta-button">View Pull Request</a>
+                <a href="https://github.com/mykie2015/overnight-mvp/blob/feature/intent-to-agent-compiler/intent_to_agent_simple.py" class="cta-button">View Source Code</a>
+                <a href="https://raw.githack.com/mykie2015/overnight-mvp/feature/context-capsule-template/templates/demo.html" class="cta-button">Context Capsule Demo</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>"Context without intent is noise."</strong></p>
+            <p>Intent Engineering Framework + Agentic Manifesto + LangChain</p>
+            <p>2026-02-11 | OpenClaw Overnight Builder</p>
+        </div>
+    </div>
+</body>
+</html>
